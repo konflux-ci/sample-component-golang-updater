@@ -12,6 +12,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -46,10 +49,11 @@ jobs:
           GIT_TOKEN: ${{ steps.mirror-token.outputs.token }}
           STAGING_DIR: ${{ steps.prepare.outputs.staging_dir }}
           GITHUB_SHA: ${{ github.sha }}
+          DRY_RUN: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
         run: bash .github/scripts/mirror/push-to-target.sh
 
       - name: Report mirror failure
-        if: failure()
+        if: failure() && github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}

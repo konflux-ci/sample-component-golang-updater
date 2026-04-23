@@ -1,32 +1,68 @@
 # Sample Golang Component for Testing Konflux
 
-This is an example Golang component for testing [Konflux](https://github.com/konflux-ci).
+This is an example Golang component for testing [Konflux](https://github.com/konflux-ci/konflux-ci).
 
 ## What It Does
 
-The component is a minimal HTTP server written in Go. It listens on port `8080` (configurable via the `PORT` environment variable) and responds with `Hello World!` on the root path. It uses the `Accept-Language` header to detect the client's preferred language via `golang.org/x/text`.
+The component is a minimal HTTP server written in Go. It listens on port `8080` (configurable via the `PORT` environment variable) and responds with `Hello World!` on the root path. It uses the `Accept-Language` header to detect the client's preferred language via [`golang.org/x/text`](https://pkg.go.dev/golang.org/x/text).
 
-## Dependency with a Known CVE
+The root **`go.mod` / `go.sum`** use a **current** `golang.org/x/text` release so day-to-day builds and the mirror to the public sample do not carry known CVEs in that module. Frozen **vulnerable** copies for demos live under [`demo/cve-onboarding/`](demo/cve-onboarding/) (see below).
 
-This component intentionally includes `golang.org/x/text` at version **v0.3.6**, which has the following known vulnerabilities:
+## Demonstrating CVE detection during onboarding
 
-| CVE | Severity | Description |
-|---|---|---|
-| CVE-2021-38561 | High (7.5) | Out-of-bounds read in `language.ParseAcceptLanguage` |
-| CVE-2022-32149 | High (7.5) | Denial of service via crafted `Accept-Language` header |
+To show what Konflux onboarding looks like when a dependency has known CVEs (for example in recordings, workshops, or screenshots):
 
-This is useful for demonstrating that Konflux can detect CVEs in application dependencies.
+1. **Replace the root module files** with the saved vulnerable snapshots (from the repository root):
 
-### Fixing the CVEs
+   ```bash
+   cp demo/cve-onboarding/go.mod go.mod
+   cp demo/cve-onboarding/go.sum go.sum
+   ```
 
-To resolve the vulnerabilities, upgrade `golang.org/x/text` to version **v0.3.8** or later:
+2. **Commit and push** (or open a PR) so Konflux runs dependency and security checks against **`golang.org/x/text` v0.3.6**. You should see findings tied to that version (for example CVE-2021-38561, CVE-2022-32149).
 
-```bash
-go get golang.org/x/text@latest
-go mod tidy
-```
+3. When you are done, **restore patched dependencies** at the repository root:
 
-After upgrading, rebuild the component and push the changes. Konflux will verify that the CVEs are no longer present.
+   ```bash
+   go get golang.org/x/text@latest
+   go mod tidy
+   ```
+
+   Commit the updated `go.mod` and `go.sum`. That returns the tree to the same style of dependency versions as before the demo.
+
+The same **`demo/cve-onboarding/`** tree is **included in the mirror** to [konflux-ci/sample-component-golang](https://github.com/konflux-ci/sample-component-golang), so users who only fork the public repo still have the vulnerable snapshots and can run the **`cp`** steps above from their clone.
+
+## Updater and public sample (`sample-component-golang-updater` ↔ `sample-component-golang`)
+
+Konflux maintains two related repositories:
+
+| Repository | Role |
+|------------|------|
+| [konflux-ci/sample-component-golang-updater](https://github.com/konflux-ci/sample-component-golang-updater) | **Updater** — onboarded to Konflux (Mintmaker, builds, `.tekton/` pipelines). This is where day-to-day changes belong. |
+| [konflux-ci/sample-component-golang](https://github.com/konflux-ci/sample-component-golang) | **Public sample** — intended to look like a repo users fork **before** Konflux onboarding (no `.tekton/` in the default tree). Content is produced by mirroring from the updater. |
+
+### Where to make changes
+
+**Make changes in [konflux-ci/sample-component-golang-updater](https://github.com/konflux-ci/sample-component-golang-updater)**, not in `konflux-ci/sample-component-golang` directly.
+
+Pull requests, pipeline tweaks, application source, and documentation updates should target the updater. The mirror overwrites `konflux-ci/sample-component-golang` on each successful run, so edits made only on the public repo would be lost.
+
+### What the mirror does
+
+When changes land on the default branch of the updater, a GitHub Actions workflow:
+
+1. Copies the repository to a staging tree (excluding updater-only automation such as the mirror scripts and workflow), including **`demo/`** so the public sample ships CVE walkthrough fixtures.
+2. Moves Konflux-generated `.tekton/` definitions into `pipelines/` (the layout expected for the public sample).
+3. Removes `metadata.namespace` from Tekton YAML under `pipelines/`, then sets `metadata.namespace: default-tenant` on each `PipelineRun` so copies users paste into a fork match the Kind demo tenant namespace (`default-tenant` in the Konflux CI docs).
+4. Rewrites `output-image` parameters from Konflux `quay.io/redhat-user-workloads/...` values to the internal-registry style used in the sample (`registry-service.kind-registry/sample-component-golang:…`).
+5. Renames Konflux pipeline files to `pipelines/sample-component-pull-request.yaml` and `pipelines/sample-component-push.yaml`.
+6. Replaces the `main` branch of [konflux-ci/sample-component-golang](https://github.com/konflux-ci/sample-component-golang) with that staging tree (using credentials from repository secrets).
+
+If the workflow fails, an issue is opened on the updater repository for investigation.
+
+### Forking for your own Konflux
+
+Fork [konflux-ci/sample-component-golang](https://github.com/konflux-ci/sample-component-golang) when you want a clean sample without Konflux metadata yet. For collaboration on the upstream Konflux sample itself, use the updater repository as described above.
 
 ## Running Locally
 

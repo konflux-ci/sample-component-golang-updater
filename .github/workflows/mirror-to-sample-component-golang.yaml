@@ -1,0 +1,63 @@
+# Mirrors this repo to konflux-ci/sample-component-golang after transforming Konflux-generated .tekton
+# content into the layout expected for public sample onboarding (pipelines/, internal registry).
+#
+# Required repository secrets (GitHub App installed on konflux-ci/sample-component-golang with contents: write):
+#   SAMPLE_COMPONENT_GOLANG_MIRROR_GITHUB_APP_ID
+#   SAMPLE_COMPONENT_GOLANG_MIRROR_GITHUB_APP_PRIVATE_KEY
+#
+# Optional env (workflow-level): override MIRROR_INTERNAL_OUTPUT_IMAGE_PREFIX or TARGET_REPOSITORY via workflow_dispatch inputs later if needed.
+name: Mirror to konflux-ci/sample-component-golang
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  MIRROR_INTERNAL_OUTPUT_IMAGE_PREFIX: registry-service.kind-registry/sample-component-golang
+  TARGET_REPOSITORY: konflux-ci/sample-component-golang
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Prepare staging tree
+        id: prepare
+        run: bash .github/scripts/mirror/prepare-staging.sh
+
+      - uses: actions/create-github-app-token@v1
+        id: mirror-token
+        with:
+          app-id: ${{ secrets.SAMPLE_COMPONENT_GOLANG_MIRROR_GITHUB_APP_ID }}
+          private-key: ${{ secrets.SAMPLE_COMPONENT_GOLANG_MIRROR_GITHUB_APP_PRIVATE_KEY }}
+          owner: konflux-ci
+          repositories: |
+            sample-component-golang
+
+      - name: Push mirror to target
+        env:
+          GIT_TOKEN: ${{ steps.mirror-token.outputs.token }}
+          STAGING_DIR: ${{ steps.prepare.outputs.staging_dir }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: bash .github/scripts/mirror/push-to-target.sh
+
+      - name: Report mirror failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_NAME: Mirror to konflux-ci/sample-component-golang
+        run: |
+          bash .github/scripts/create-or-update-issue.sh \
+            "Mirror to konflux-ci/sample-component-golang workflow failed" \
+            "The workflow that mirrors this repository to konflux-ci/sample-component-golang (after moving .tekton to pipelines/, normalizing pipeline namespaces to default-tenant, and rewriting output-image to the internal registry) failed."

@@ -1,0 +1,38 @@
+# Build the Konflux Dockerfile for both root (patched) and demo CVE (frozen) go.mod/go.sum,
+# run each image, and verify the HTTP server responds as expected.
+name: Verify Docker build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: verify-docker-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker-build-and-smoke:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [latest, demo-vulnerable]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Use frozen CVE demo dependencies
+        if: matrix.variant == 'demo-vulnerable'
+        run: |
+          cp demo/cve-onboarding/go.mod go.mod
+          cp demo/cve-onboarding/go.sum go.sum
+
+      - name: Build image
+        run: |
+          go list -m all
+          docker build -t "sample-component-golang:${{ matrix.variant }}" .
+
+      - name: Run container and smoke-test HTTP
+        run: bash .github/scripts/verify-docker-smoke.sh "sample-component-golang:${{ matrix.variant }}" "${{ matrix.variant }}"

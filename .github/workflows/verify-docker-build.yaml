@@ -26,8 +26,8 @@ jobs:
       - name: Use frozen CVE demo dependencies
         if: matrix.variant == 'demo-vulnerable'
         run: |
-          cp demo/cve-onboarding/go.mod go.mod
-          cp demo/cve-onboarding/go.sum go.sum
+          cp demo/cve-onboarding/go.mod.cve go.mod
+          cp demo/cve-onboarding/go.sum.cve go.sum
 
       - name: Build image
         run: |

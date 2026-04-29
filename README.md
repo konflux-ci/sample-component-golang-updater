@@ -6,7 +6,7 @@ This is an example Golang component for testing [Konflux](https://github.com/kon
 
 The component is a minimal HTTP server written in Go. It listens on port `8080` (configurable via the `PORT` environment variable) and responds with `Hello World!` on the root path. It uses the `Accept-Language` header to detect the client's preferred language via [`golang.org/x/text`](https://pkg.go.dev/golang.org/x/text).
 
-The root **`go.mod` / `go.sum`** use a **current** `golang.org/x/text` release so day-to-day builds and the mirror to the public sample do not carry known CVEs in that module. Frozen **vulnerable** copies for demos live under [`demo/cve-onboarding/`](demo/cve-onboarding/) (see below).
+The root **`go.mod` / `go.sum`** use a **current** `golang.org/x/text` release so day-to-day builds and the mirror to the public sample do not carry known CVEs in that module. Frozen **vulnerable** copies for demos live under [`demo/cve-onboarding/`](demo/cve-onboarding/) (see below). They are saved as `go.mod.cve` / `go.sum.cve` so that syft does not pick them up in the SBOM.
 
 ## Demonstrating CVE detection during onboarding
 
@@ -15,8 +15,8 @@ To show what Konflux onboarding looks like when a dependency has known CVEs (for
 1. **Replace the root module files** with the saved vulnerable snapshots (from the repository root):
 
    ```bash
-   cp demo/cve-onboarding/go.mod go.mod
-   cp demo/cve-onboarding/go.sum go.sum
+   cp demo/cve-onboarding/go.mod.cve go.mod
+   cp demo/cve-onboarding/go.sum.cve go.sum
    ```
 
 2. **Commit and push** (or open a PR) so Konflux runs dependency and security checks against **`golang.org/x/text` v0.3.6**. You should see findings tied to that version (for example CVE-2021-38561, CVE-2022-32149).

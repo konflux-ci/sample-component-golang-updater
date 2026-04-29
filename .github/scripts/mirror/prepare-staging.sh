@@ -16,12 +16,11 @@ echo "staging_dir=$STAGING" >>"${GITHUB_OUTPUT}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Copy repo without git metadata and without this workflow's mirror-only assets (they must not land on the public sample).
+# Copy repo without git metadata and without the entire .github/ tree (updater CI, mirror scripts, workflows).
+# The public sample does not ship GitHub automation from this mirror; see push-to-target rsync --delete for removal of old paths.
 rsync -a \
   --exclude=.git \
-  --exclude=.github/workflows/mirror-to-sample-component-golang.yaml \
-  --exclude=.github/scripts/mirror/ \
-  --exclude=.github/scripts/create-or-update-issue.sh \
+  --exclude=.github/ \
   "${ROOT}/" "${STAGING}/"
 
 pushd "$STAGING" >/dev/null

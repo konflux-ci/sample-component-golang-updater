@@ -51,7 +51,7 @@ Pull requests, pipeline tweaks, application source, and documentation updates sh
 
 When changes land on the default branch of the updater, a GitHub Actions workflow:
 
-1. Copies the repository to a staging tree (excluding updater-only automation such as the mirror scripts and workflow), including **`demo/`** so the public sample ships CVE walkthrough fixtures.
+1. Copies the repository to a staging tree (excluding the entire **`.github/`** directory—workflows, scripts, and all other GitHub metadata), including **`demo/`** so the public sample ships CVE walkthrough fixtures. A successful push also **removes** any `.github/` paths that existed on the public repo from an earlier mirror but are no longer present in the staging tree (see `push-to-target.sh` `rsync --delete`).
 2. Moves Konflux-generated `.tekton/` definitions into `pipelines/` (the layout expected for the public sample).
 3. Removes `metadata.namespace` from Tekton YAML under `pipelines/`, then sets `metadata.namespace: default-tenant` on each `PipelineRun` so copies users paste into a fork match the Kind demo tenant namespace (`default-tenant` in the Konflux CI docs).
 4. Rewrites `output-image` parameters from Konflux `quay.io/redhat-user-workloads/...` values to the internal-registry style used in the sample (`registry-service.kind-registry/sample-component-golang:…`).

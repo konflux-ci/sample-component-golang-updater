@@ -1,3 +1,13 @@
+# Konflux Pipelines as Code — pull-request build.
+#
+# This file is mirrored to konflux-ci/sample-component-golang (under pipelines/)
+# with transformations applied by .github/scripts/mirror/:
+#   - metadata.namespace is stripped and replaced with "default-tenant"
+#   - output-image is rewritten to the internal Kind registry
+#   - the file is renamed to sample-component-pull-request.yaml
+#
+# DO NOT add metadata.namespace here — the mirror scripts manage it for the
+# public sample.  Namespace is set by Konflux when the PipelineRun is created.
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:

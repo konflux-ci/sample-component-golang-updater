@@ -1,3 +1,8 @@
+# Multi-stage build producing a static Go binary on a scratch (empty) base
+# image — no shell, no OS packages, no libc.  Runs as non-root (UID 65532).
+#
+# The Go module path (github.com/konflux-ci/sample-component-golang) intentionally
+# matches the public mirror repo, not this updater repo.
 FROM registry.access.redhat.com/hi/go@sha256:4ab8dd1e15e1e3fab2f0ddf1ccc8dd881ba921384d8854feb95f6b499a5a90c6 AS builder
 
 WORKDIR /workspace

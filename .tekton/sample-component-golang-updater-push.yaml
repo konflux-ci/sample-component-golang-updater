@@ -6,8 +6,9 @@
 #   - output-image is rewritten to the internal Kind registry
 #   - the file is renamed to sample-component-push.yaml
 #
-# DO NOT add metadata.namespace here — the mirror scripts manage it for the
-# public sample.  Namespace is set by Konflux when the PipelineRun is created.
+# The existing metadata.namespace below is expected — Konflux sets it during
+# onboarding.  DO NOT change or remove it.  The mirror scripts strip and
+# replace it with "default-tenant" for the public sample automatically.
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:

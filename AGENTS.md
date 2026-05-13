@@ -42,8 +42,8 @@ bash .github/scripts/verify-docker-smoke.sh sample-component-golang:latest lates
 directly — the mirror will overwrite your changes.
 - **Do not bump `demo/cve-onboarding/` fixtures** — they are frozen
 intentionally. See `demo/cve-onboarding/README.md`.
-- **Do not add `metadata.namespace` to Tekton PipelineRuns** — see the
-comments at the top of the `.tekton/` YAML files.
-- **Do not remove the Renovate `demo/`** exclusion** — see the `description`
-field in `renovate.json`.
+- **Do not change `metadata.namespace` in Tekton PipelineRuns** — see the
+  comments at the top of the `.tekton/` YAML files.
+- **Do not remove the Renovate `demo/**` exclusion** — see the `description`
+  field in `renovate.json`.
 

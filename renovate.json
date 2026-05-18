@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "demo/** is excluded because it contains frozen vulnerable go.mod/go.sum snapshots used for CVE onboarding demos — they must not be auto-bumped.",
   "extends": ["config:recommended"],
   "ignorePaths": [
     "demo/**"

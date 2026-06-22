@@ -21,7 +21,7 @@ jobs:
       matrix:
         variant: [latest, demo-vulnerable]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Use frozen CVE demo dependencies
         if: matrix.variant == 'demo-vulnerable'

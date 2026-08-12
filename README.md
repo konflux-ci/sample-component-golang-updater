@@ -64,6 +64,11 @@ If the workflow fails, an issue is opened on the updater repository for investig
 
 Fork [konflux-ci/sample-component-golang](https://github.com/konflux-ci/sample-component-golang) when you want a clean sample without Konflux metadata yet. For collaboration on the upstream Konflux sample itself, use the updater repository as described above.
 
+## Installation
+
+Contributors — clone this updater and see [Running Locally](#running-locally).
+For your own Konflux — fork the public sample: [Forking for your own Konflux](#forking-for-your-own-konflux).
+
 ## Running Locally
 
 ```bash

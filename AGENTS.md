@@ -25,6 +25,17 @@ overwritten on each mirror run.
 - Run locally: `go run main.go`
 - Container build: `docker build -t sample-component-golang .`
 
+## Single-file verification
+
+After a small Go change, format-check and vet the **file you edited**.
+
+Example (replace `main.go` with the file you changed):
+
+```bash
+gofmt -l main.go
+go vet main.go
+```
+
 ## Verifying Changes
 
 ```bash

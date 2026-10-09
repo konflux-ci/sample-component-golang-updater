@@ -58,3 +58,7 @@ intentionally. See `demo/cve-onboarding/README.md`.
 - **Do not remove the Renovate `demo/**` exclusion** — see the `description`
   field in `renovate.json`.
 
+
+## Fullsend retro
+
+When writing retro output (PR close or `/fs-retro`), read `skills/retro-filing-policy/SKILL.md`. Keep `proposals` empty unless the human comment explicitly says to file issues.

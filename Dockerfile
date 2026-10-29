@@ -18,6 +18,7 @@ RUN CGO_ENABLED=0 go build -o /opt/app-root/sample-component-golang main.go
 FROM scratch
 
 COPY --from=builder /opt/app-root/sample-component-golang /sample-component-golang
+COPY LICENSE /LICENSE
 
 EXPOSE 8080
 USER 65532:65532

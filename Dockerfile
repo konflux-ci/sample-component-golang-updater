@@ -3,7 +3,7 @@
 #
 # The Go module path (github.com/konflux-ci/sample-component-golang) intentionally
 # matches the public mirror repo, not this updater repo.
-FROM registry.access.redhat.com/hi/go@sha256:4f64134d9fabdf432297a05dd845d0f5df4184dc600937568ffcf9c0056d12a8 AS builder
+FROM registry.access.redhat.com/hi/go@sha256:272f0bce0fbc8d8756c275538de3024059d648f2f1553ed3b63beeda992128e4 AS builder
 
 WORKDIR /workspace
 

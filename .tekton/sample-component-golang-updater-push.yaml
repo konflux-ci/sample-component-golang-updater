@@ -400,6 +400,8 @@ spec:
         value: $(tasks.build-image-index.results.IMAGE_DIGEST)
       - name: image-url
         value: $(tasks.build-image-index.results.IMAGE_URL)
+      - name: tpa-url
+        value: https://rhda.rhcloud.com/api/v5/analysis
       runAfter:
       - build-image-index
       taskRef:
